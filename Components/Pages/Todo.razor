@@ -1,0 +1,56 @@
+﻿@page "/todo"
+@rendermode InteractiveServer
+<h3>To-Do List</h3>
+
+<div class="input-group mb-3">
+    <input type="text" class="form-control" placeholder="Add a new task..." @bind="newTask" @bind:event="oninput">
+    <button class="btn btn-primary" @onclick="AddTask">Add</button>
+</div>
+
+<ul class="list-group">
+    @foreach (var task in tasks)
+    {
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <input type="checkbox" @bind="task.IsDone" class="form-check-input me-2">
+                <span class="@ClassBasedOnTaskCompletion(task)">@task.Title</span>
+            </div>
+            <button class="btn btn-danger btn-sm" @onclick="@(() => DeleteTask(task))">Delete</button>
+        </li>
+    }
+</ul>
+
+@code {
+    private string newTask = string.Empty;
+    private List<TodoItem> tasks = new();
+
+    private void AddTask()
+    {
+        // Check if the task input is not empty or whitespace
+        if (!string.IsNullOrWhiteSpace(newTask))
+        {
+            // Add the new task to the list
+            tasks.Add(new TodoItem { Title = newTask });
+            // Clear the input field
+            newTask = string.Empty;
+
+            // Force the component to re-render if necessary
+            StateHasChanged();
+        }
+    }
+
+    private void DeleteTask(TodoItem task)
+    {
+        // Remove the selected task from the list
+        tasks.Remove(task);
+        // Force the component to re-render if necessary
+        StateHasChanged();
+    }
+
+    private string ClassBasedOnTaskCompletion(TodoItem task)
+    {
+        // Return the class based on whether the task is completed
+        return task.IsDone ? "text-decoration-line-through" : string.Empty;
+    }
+
+}
